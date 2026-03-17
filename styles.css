@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 80" width="120" height="80">
+  <!-- Open book shape -->
+  <path d="M60 15 C45 10 20 12 8 18 L8 65 C20 59 45 57 60 62 C75 57 100 59 112 65 L112 18 C100 12 75 10 60 15Z" fill="#C8872A" opacity="0.15"/>
+  <path d="M60 15 L60 62" stroke="#C8872A" stroke-width="2.5" stroke-linecap="round"/>
+  <!-- Left page -->
+  <path d="M60 15 C45 10 20 12 8 18 L8 65 C20 59 45 57 60 62Z" fill="none" stroke="#C8872A" stroke-width="2" stroke-linejoin="round"/>
+  <!-- Right page -->
+  <path d="M60 15 C75 10 100 12 112 18 L112 65 C100 59 75 57 60 62Z" fill="none" stroke="#C8872A" stroke-width="2" stroke-linejoin="round"/>
+  <!-- Lines on left page -->
+  <line x1="22" y1="30" x2="52" y2="27" stroke="#C8872A" stroke-width="1.2" stroke-linecap="round" opacity="0.6"/>
+  <line x1="22" y1="38" x2="52" y2="35" stroke="#C8872A" stroke-width="1.2" stroke-linecap="round" opacity="0.6"/>
+  <line x1="22" y1="46" x2="52" y2="43" stroke="#C8872A" stroke-width="1.2" stroke-linecap="round" opacity="0.6"/>
+  <!-- Lines on right page -->
+  <line x1="68" y1="27" x2="98" y2="30" stroke="#C8872A" stroke-width="1.2" stroke-linecap="round" opacity="0.6"/>
+  <line x1="68" y1="35" x2="98" y2="38" stroke="#C8872A" stroke-width="1.2" stroke-linecap="round" opacity="0.6"/>
+  <line x1="68" y1="43" x2="98" y2="46" stroke="#C8872A" stroke-width="1.2" stroke-linecap="round" opacity="0.6"/>
+</svg>

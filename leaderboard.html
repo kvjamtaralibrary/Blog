@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard — The Open Book</title>
+  <link rel="icon" href="assets/logo.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="css/styles.css">
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+</head>
+<body>
+
+<nav class="navbar" id="mainNav"></nav>
+
+<div class="page-header">
+  <h1>⚙️ Admin Dashboard</h1>
+  <p>Moderate comments, manage the book catalog, and view library stats.</p>
+</div>
+
+<!-- Access gate — shown while checking auth -->
+<div id="accessGate" style="text-align:center; padding:80px 20px;">
+  <p style="color:var(--text-muted);">Checking access...</p>
+</div>
+
+<!-- Dashboard content — hidden until verified -->
+<div id="dashboardContent" style="display:none;">
+
+  <section class="section">
+    <div class="container">
+
+      <!-- Stats -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <span class="stat-number" id="pendingCount">—</span>
+          <span class="stat-label">Pending Comments</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-number" id="approvedCount">—</span>
+          <span class="stat-label">Approved Comments</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-number" id="bookCount">—</span>
+          <span class="stat-label">Books in Catalog</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-number" id="studentCount">—</span>
+          <span class="stat-label">Registered Students</span>
+        </div>
+      </div>
+
+      <!-- Tabs -->
+      <div class="admin-tabs">
+        <button class="admin-tab active" onclick="switchTab('comments')">💬 Pending Comments</button>
+        <button class="admin-tab" onclick="switchTab('books')">📚 Manage Books</button>
+        <button class="admin-tab" onclick="switchTab('backup')">💾 Backup</button>
+      </div>
+
+      <!-- COMMENTS TAB -->
+      <div class="admin-panel active" id="tabComments">
+        <h3 style="margin-bottom:16px;">Pending Comments</h3>
+        <div id="pendingContainer"><p class="no-items">Loading...</p></div>
+      </div>
+
+      <!-- BOOKS TAB -->
+      <div class="admin-panel" id="tabBooks">
+        <h3 style="margin-bottom:20px;">Add New Book</h3>
+        <div class="card" style="margin-bottom:28px; background:var(--warm-white);">
+          <div class="form-row">
+            <div class="form-group">
+              <label>Title *</label>
+              <input type="text" id="bookTitle" placeholder="Book title">
+            </div>
+            <div class="form-group">
+              <label>Author *</label>
+              <input type="text" id="bookAuthor" placeholder="Author name">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Category *</label>
+              <select id="bookCategory">
+                <option value="">Select category</option>
+                <option>Fiction</option>
+                <option>Non-Fiction</option>
+                <option>Science</option>
+                <option>History</option>
+                <option>Self Development</option>
+                <option>Biography</option>
+                <option>Hindi Literature</option>
+                <option>Children</option>
+                <option>Reference</option>
+                <option>Poetry</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Rating (0–5)</label>
+              <input type="number" id="bookRating" min="0" max="5" step="0.1" placeholder="4.5">
+            </div>
+            <div class="form-group">
+              <label>Shelf Location</label>
+              <input type="text" id="bookShelf" placeholder="e.g. A3">
+            </div>
+          </div>
+          <div style="display:flex; align-items:center; gap:10px; margin-bottom:16px;">
+            <input type="checkbox" id="bookAvailable" checked>
+            <label for="bookAvailable" style="font-size:0.9rem;">Currently Available</label>
+          </div>
+          <button class="btn btn-green" onclick="addBook()">📚 Add Book to Catalog</button>
+        </div>
+
+        <h3 style="margin-bottom:16px;">Existing Books</h3>
+        <div id="adminBookList"><p class="no-items">Loading books...</p></div>
+      </div>
+
+      <!-- BACKUP TAB -->
+      <div class="admin-panel" id="tabBackup">
+        <div class="card">
+          <h3 style="margin-bottom:12px;">💾 Export Database Backup</h3>
+          <p style="color:var(--text-muted); font-size:0.9rem; margin-bottom:20px;">
+            Download a JSON backup of all approved comments and books from Firebase.
+          </p>
+          <button class="btn btn-primary" onclick="exportBackup()">⬇️ Download Backup (JSON)</button>
+          <div id="backupOutput" style="margin-top:16px;"></div>
+        </div>
+        <div class="card" style="margin-top:20px;">
+          <h3 style="margin-bottom:12px;">🔐 Firebase Security Rules</h3>
+          <p style="color:var(--text-muted); font-size:0.9rem; margin-bottom:12px;">
+            Copy and paste these rules into your Firebase Realtime Database → Rules tab:
+          </p>
+          <pre style="background:var(--dark); color:#c8e6c9; padding:16px; border-radius:8px; font-size:0.82rem; overflow-x:auto; white-space:pre-wrap;">{
+  "rules": {
+    "pending_comments": {
+      ".write": "auth != null",
+      ".read": "auth.token.email == 'kvjamtaralibrary@gmail.com'"
+    },
+    "approved_comments": {
+      ".read": true,
+      ".write": "auth.token.email == 'kvjamtaralibrary@gmail.com'"
+    },
+    "books": {
+      ".read": true,
+      ".write": "auth.token.email == 'kvjamtaralibrary@gmail.com'"
+    },
+    "leaderboard": {
+      ".read": true,
+      ".write": "auth != null"
+    },
+    "book_requests": {
+      ".write": "auth != null",
+      ".read": "auth.token.email == 'kvjamtaralibrary@gmail.com'"
+    }
+  }
+}</pre>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+</div>
+
+<footer class="footer" id="mainFooter"></footer>
+
+<script src="js/firebase-config.js"></script>
+<script src="js/shared.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/ai-filter.js"></script>
+<script src="js/comments.js"></script>
+<script src="js/moderation.js"></script>
+<script>
+  injectNav("admin");
+  injectFooter();
+
+  const ADMIN_EMAIL = "kvjamtaralibrary@gmail.com";
+
+  firebase.auth().onAuthStateChanged(user => {
+    const gate = document.getElementById("accessGate");
+    const content = document.getElementById("dashboardContent");
+    if (!user || user.email !== ADMIN_EMAIL) {
+      gate.innerHTML = `
+        <div style="max-width:400px; margin:0 auto;">
+          <div style="font-size:3rem; margin-bottom:16px;">🔒</div>
+          <h2>Admin Access Only</h2>
+          <p style="color:var(--text-muted); margin:12px 0 24px;">
+            This page is restricted to the library administrator.<br>
+            ${user ? `You are signed in as <strong>${user.email}</strong>.` : 'Please sign in with the admin account.'}
+          </p>
+          <a href="${user ? 'index.html' : 'login.html'}" class="btn btn-primary">${user ? 'Go to Home' : 'Sign In'}</a>
+        </div>
+      `;
+    } else {
+      gate.style.display = "none";
+      content.style.display = "block";
+      loadStats();
+      loadPendingComments();
+      loadAdminBooks();
+    }
+  });
+
+  function switchTab(tab) {
+    document.querySelectorAll(".admin-tab").forEach(b => b.classList.remove("active"));
+    document.querySelectorAll(".admin-panel").forEach(p => p.classList.remove("active"));
+    document.getElementById("tab" + tab.charAt(0).toUpperCase() + tab.slice(1)).classList.add("active");
+    event.target.classList.add("active");
+  }
+
+  async function exportBackup() {
+    const output = document.getElementById("backupOutput");
+    output.innerHTML = `<p style="color:var(--text-muted)">Fetching data...</p>`;
+    try {
+      const [commentsSnap, booksSnap] = await Promise.all([
+        db.ref("approved_comments").once("value"),
+        db.ref("books").once("value")
+      ]);
+      const backup = {
+        exportDate: new Date().toISOString(),
+        approved_comments: commentsSnap.val() || {},
+        books: booksSnap.val() || {}
+      };
+      const blob = new Blob([JSON.stringify(backup, null, 2)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url; a.download = `kvjmt-backup-${Date.now()}.json`;
+      a.click();
+      output.innerHTML = `<p style="color:var(--green)">✅ Backup downloaded!</p>`;
+    } catch (err) {
+      output.innerHTML = `<p style="color:red">Error: ${err.message}</p>`;
+    }
+  }
+</script>
+</body>
+</html>

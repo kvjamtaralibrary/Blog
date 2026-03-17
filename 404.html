@@ -1,0 +1,16 @@
+// Firebase Configuration — KV Jamtara Library
+const firebaseConfig = {
+  apiKey: "AIzaSyB_YfcC5oEXixa4_5apkaFLm5--FNFFAxA",
+  authDomain: "kvjmt-library.firebaseapp.com",
+  databaseURL: "https://kvjmt-library-default-rtdb.firebaseio.com",
+  projectId: "kvjmt-library",
+  storageBucket: "kvjmt-library.firebasestorage.app",
+  messagingSenderId: "294736930",
+  appId: "1:294736930:web:99aec779080f679191667b",
+  measurementId: "G-J6KDHPGWT9"
+};
+
+// Initialize Firebase (using compat SDKs for simplicity — no bundler needed)
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+const auth = firebase.auth();

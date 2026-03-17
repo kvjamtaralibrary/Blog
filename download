@@ -1,0 +1,115 @@
+// catalog.js — Book catalog display and recommendations
+
+let allBooks = {};
+let currentCategory = "All";
+
+function loadCatalog() {
+  const container = document.getElementById("catalogGrid");
+  if (!container) return;
+
+  db.ref("books").on("value", snap => {
+    allBooks = snap.val() || {};
+    renderCatalog(allBooks);
+    buildCategoryFilters(allBooks);
+  });
+}
+
+function renderCatalog(books) {
+  const container = document.getElementById("catalogGrid");
+  if (!container) return;
+  container.innerHTML = "";
+
+  const filtered = Object.entries(books).filter(([id, book]) =>
+    currentCategory === "All" || book.category === currentCategory
+  );
+
+  if (filtered.length === 0) {
+    container.innerHTML = `<p class="no-items">No books found in this category.</p>`;
+    return;
+  }
+
+  filtered.forEach(([id, book]) => {
+    container.appendChild(renderBookCard(id, book));
+  });
+}
+
+function renderBookCard(id, book) {
+  const card = document.createElement("div");
+  card.className = "book-card";
+  const stars = "★".repeat(Math.round(book.rating || 0)) + "☆".repeat(5 - Math.round(book.rating || 0));
+  card.innerHTML = `
+    <div class="book-cover">
+      <span class="book-icon">📖</span>
+      <span class="book-category-badge">${escapeHTML(book.category || "General")}</span>
+    </div>
+    <div class="book-info">
+      <h3 class="book-title">${escapeHTML(book.title)}</h3>
+      <p class="book-author">by ${escapeHTML(book.author)}</p>
+      <div class="book-rating" title="${book.rating}/5">${stars} <small>${book.rating || "N/A"}</small></div>
+      <div class="book-availability ${book.available ? 'available' : 'issued'}">
+        ${book.available ? "✅ Available" : "❌ Currently Issued"}
+      </div>
+      ${book.shelf ? `<div class="book-shelf">📍 Shelf: ${escapeHTML(book.shelf)}</div>` : ""}
+    </div>
+  `;
+  return card;
+}
+
+function buildCategoryFilters(books) {
+  const filterEl = document.getElementById("categoryFilters");
+  if (!filterEl) return;
+
+  const categories = ["All", ...new Set(Object.values(books).map(b => b.category).filter(Boolean))];
+  filterEl.innerHTML = "";
+  categories.forEach(cat => {
+    const btn = document.createElement("button");
+    btn.className = "filter-btn" + (cat === currentCategory ? " active" : "");
+    btn.textContent = cat;
+    btn.onclick = () => {
+      currentCategory = cat;
+      document.querySelectorAll(".filter-btn").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      renderCatalog(allBooks);
+    };
+    filterEl.appendChild(btn);
+  });
+}
+
+function searchBooks() {
+  const query = document.getElementById("searchInput").value.trim().toLowerCase();
+  if (!query) { renderCatalog(allBooks); return; }
+  const filtered = {};
+  Object.entries(allBooks).forEach(([id, book]) => {
+    if (
+      book.title.toLowerCase().includes(query) ||
+      book.author.toLowerCase().includes(query) ||
+      (book.category || "").toLowerCase().includes(query)
+    ) {
+      filtered[id] = book;
+    }
+  });
+  renderCatalog(filtered);
+}
+
+function recommendBooks(userInterest) {
+  if (!userInterest || !allBooks) return;
+  const container = document.getElementById("recommendationsGrid");
+  if (!container) return;
+  container.innerHTML = "";
+  const recommended = Object.entries(allBooks).filter(([id, book]) =>
+    book.category === userInterest
+  );
+  if (recommended.length === 0) {
+    container.innerHTML = `<p>No recommendations found for "${userInterest}" yet.</p>`;
+    return;
+  }
+  recommended.forEach(([id, book]) => container.appendChild(renderBookCard(id, book)));
+}
+
+function requestBook(bookTitle) {
+  const user = firebase.auth().currentUser;
+  if (!user) { alert("Please login to request a book."); return; }
+  db.ref("book_requests").push({
+    bookTitle, userEmail: user.email, userName: user.displayName, timestamp: Date.now()
+  }).then(() => showNotification(`📚 Request sent for "${bookTitle}"!`, "success"));
+}

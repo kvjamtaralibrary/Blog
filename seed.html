@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reading Leaderboard — The Open Book</title>
+  <link rel="icon" href="assets/logo.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="css/styles.css">
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+</head>
+<body>
+
+<nav class="navbar" id="mainNav"></nav>
+
+<div class="page-header">
+  <h1>🏆 Reading Leaderboard</h1>
+  <p>Celebrating KV Jamtara's most dedicated readers. How many books have you read this year?</p>
+</div>
+
+<section class="section">
+  <div class="container" style="max-width:750px;">
+
+    <!-- My Progress Form -->
+    <div class="my-progress-form" id="progressForm" style="display:none;">
+      <h3>📊 Update Your Reading Progress</h3>
+      <p style="color:var(--text-muted); font-size:0.9rem; margin:8px 0 20px;">
+        Tell us how many books you've read this year to appear on the leaderboard!
+      </p>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Books Read This Year</label>
+          <input type="number" id="booksReadInput" min="0" placeholder="e.g. 12">
+        </div>
+        <div class="form-group">
+          <label>Your Class / Grade</label>
+          <input type="text" id="classInput" placeholder="e.g. Class 9-A">
+        </div>
+      </div>
+      <button class="btn btn-primary" onclick="updateMyProgress()">🎯 Update My Score</button>
+    </div>
+
+    <div class="login-prompt" id="leaderLoginPrompt">
+      🔒 <a href="login.html"><strong>Sign in</strong></a> to appear on the leaderboard and track your reading!
+    </div>
+
+    <!-- Leaderboard -->
+    <h3 style="margin: 28px 0 16px; font-family:'Playfair Display',serif;">Top Readers</h3>
+    <div id="leaderboardList">
+      <p class="no-items">Loading leaderboard...</p>
+    </div>
+
+  </div>
+</section>
+
+<footer class="footer" id="mainFooter"></footer>
+
+<script src="js/firebase-config.js"></script>
+<script src="js/shared.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/ai-filter.js"></script>
+<script src="js/comments.js"></script>
+<script src="js/leaderboard.js"></script>
+<script>
+  injectNav("leaderboard");
+  injectFooter();
+  loadLeaderboard();
+
+  document.addEventListener("authReady", e => {
+    const user = e.detail.user;
+    document.getElementById("progressForm").style.display = user ? "block" : "none";
+    document.getElementById("leaderLoginPrompt").style.display = user ? "none" : "block";
+  });
+</script>
+</body>
+</html>

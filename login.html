@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Book Catalog — The Open Book</title>
+  <link rel="icon" href="assets/logo.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="css/styles.css">
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+</head>
+<body>
+
+<nav class="navbar" id="mainNav"></nav>
+
+<div class="page-header">
+  <h1>📖 Book Catalog</h1>
+  <p>Browse our complete library collection. Search, filter by category, or let us recommend your next read.</p>
+</div>
+
+<section class="section">
+  <div class="container">
+
+    <!-- Search & Filters -->
+    <div class="catalog-controls">
+      <div class="search-box">
+        <input type="text" id="searchInput" placeholder="Search by title, author, or category..." oninput="searchBooks()">
+        <button class="btn btn-primary" onclick="searchBooks()">🔍</button>
+      </div>
+    </div>
+    <div id="categoryFilters" style="margin-bottom:24px;"></div>
+
+    <!-- Recommendation -->
+    <div class="card" style="margin-bottom:32px; background: var(--warm-white);">
+      <h3>✨ Get Book Recommendations</h3>
+      <p style="color:var(--text-muted); font-size:0.9rem; margin:8px 0 14px;">Tell us what you're interested in and we'll suggest books for you.</p>
+      <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
+        <select id="interestSelect" class="form-group" style="padding:10px 14px; border:2px solid var(--border); border-radius:8px; font-family:'DM Sans',sans-serif; background:#fff; min-width:200px;">
+          <option value="">Choose a category...</option>
+          <option value="Fiction">Fiction</option>
+          <option value="Non-Fiction">Non-Fiction</option>
+          <option value="Science">Science</option>
+          <option value="History">History</option>
+          <option value="Self Development">Self Development</option>
+          <option value="Biography">Biography</option>
+          <option value="Hindi Literature">Hindi Literature</option>
+          <option value="Children">Children</option>
+        </select>
+        <button class="btn btn-primary" onclick="recommendBooks(document.getElementById('interestSelect').value)">Get Recommendations</button>
+      </div>
+    </div>
+
+    <!-- Recommendations Output -->
+    <div id="recommendationsGrid" style="margin-bottom:32px;"></div>
+
+    <!-- All Books -->
+    <h3 style="margin-bottom:16px; font-family:'Playfair Display',serif;">All Books</h3>
+    <div class="catalog-grid" id="catalogGrid">
+      <p class="no-items">Loading books...</p>
+    </div>
+
+  </div>
+</section>
+
+<footer class="footer" id="mainFooter"></footer>
+
+<script src="js/firebase-config.js"></script>
+<script src="js/shared.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/ai-filter.js"></script>
+<script src="js/comments.js"></script>
+<script src="js/catalog.js"></script>
+<script>
+  injectNav("catalog");
+  injectFooter();
+  loadCatalog();
+</script>
+</body>
+</html>

@@ -1,0 +1,43 @@
+// shared.js — Shared nav/footer injector for all pages
+
+function injectNav(activePage) {
+  const nav = document.getElementById("mainNav");
+  if (!nav) return;
+  nav.innerHTML = `
+    <div class="nav-inner">
+      <a href="index.html" class="nav-brand">📚 <span>The Open Book</span></a>
+      <button class="nav-toggle" onclick="toggleMenu()" aria-label="Menu">☰</button>
+      <ul class="nav-links" id="navLinks">
+        <li><a href="index.html" class="${activePage==='home'?'active':''}">Home</a></li>
+        <li><a href="catalog.html" class="${activePage==='catalog'?'active':''}">📖 Catalog</a></li>
+        <li><a href="leaderboard.html" class="${activePage==='leaderboard'?'active':''}">🏆 Leaderboard</a></li>
+        <li><a href="index.html#comments" class="${activePage==='comments'?'active':''}">💬 Comments</a></li>
+        <li><a href="admin.html" id="adminLink" style="display:none">⚙️ Admin</a></li>
+      </ul>
+      <div class="nav-auth">
+        <div id="userInfo" style="display:none"></div>
+        <button id="loginBtn" class="btn" onclick="window.location.href='login.html'">Sign In</button>
+        <button id="logoutBtn" class="btn" onclick="logout()">Sign Out</button>
+      </div>
+    </div>
+  `;
+}
+
+function injectFooter() {
+  const footer = document.getElementById("mainFooter");
+  if (!footer) return;
+  footer.innerHTML = `
+    <div class="footer-nav">
+      <a href="index.html">Home</a>
+      <a href="catalog.html">Book Catalog</a>
+      <a href="leaderboard.html">Leaderboard</a>
+      <a href="login.html">Login</a>
+    </div>
+    <p>📚 The Open Book — PM Shri KV Jamtara Library</p>
+    <p style="margin-top:6px">🏫 PM Shri Kendriya Vidyalaya, Jamtara, Jharkhand</p>
+  `;
+}
+
+function toggleMenu() {
+  document.getElementById("navLinks").classList.toggle("open");
+}

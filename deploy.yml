@@ -1,0 +1,142 @@
+# 📚 The Open Book — PM Shri KV Jamtara Library
+
+Official library website for **PM Shri Kendriya Vidyalaya, Jamtara, Jharkhand**.
+
+🌐 **Live Site:** https://kvjmt-theopenbook.netlify.app/
+
+---
+
+## ✨ Features
+
+| Feature | Details |
+|---|---|
+| 🔐 Google Login | Gmail + @kvs.gov.in accounts only |
+| 💬 Secure Comments | Login required, pending admin approval |
+| ⚙️ Admin Dashboard | Approve/reject comments, manage books |
+| 📖 Book Catalog | Search, filter by category, get recommendations |
+| 🏆 Reading Leaderboard | Track and celebrate top readers |
+| 🛡️ Abuse Detection | Automatic profanity and spam filtering |
+| 📱 Mobile Responsive | Works on all screen sizes |
+| 💾 Data Backup | One-click JSON export from admin panel |
+
+---
+
+## 🗂️ Project Structure
+
+```
+kvjmt-library/
+├── index.html          ← Home page + comments
+├── login.html          ← Google Sign-In page
+├── catalog.html        ← Book catalog + recommendations
+├── leaderboard.html    ← Reading leaderboard
+├── admin.html          ← Admin moderation dashboard
+├── css/
+│   └── styles.css      ← All styles
+├── js/
+│   ├── firebase-config.js  ← Firebase keys (replace with yours)
+│   ├── shared.js           ← Nav/footer injector
+│   ├── auth.js             ← Google authentication
+│   ├── ai-filter.js        ← Profanity/spam detection
+│   ├── comments.js         ← Comment submit + display
+│   ├── moderation.js       ← Admin moderation tools
+│   ├── catalog.js          ← Book catalog + search
+│   └── leaderboard.js      ← Leaderboard logic
+└── assets/
+    └── (place logo.png here)
+```
+
+---
+
+## 🚀 Deploy to GitHub Pages
+
+1. **Fork or upload** this repository to GitHub
+2. Go to **Settings → Pages**
+3. Set Source: **Deploy from branch → main → / (root)**
+4. Your site will be live at: `https://YOUR_USERNAME.github.io/kvjmt-library`
+
+---
+
+## 🔥 Firebase Setup
+
+The Firebase project is already configured in `js/firebase-config.js`.
+
+### Set Security Rules
+Go to **Firebase Console → Realtime Database → Rules** and paste:
+
+```json
+{
+  "rules": {
+    "pending_comments": {
+      ".write": "auth != null",
+      ".read": "auth.token.email == 'kvjamtaralibrary@gmail.com'"
+    },
+    "approved_comments": {
+      ".read": true,
+      ".write": "auth.token.email == 'kvjamtaralibrary@gmail.com'"
+    },
+    "books": {
+      ".read": true,
+      ".write": "auth.token.email == 'kvjamtaralibrary@gmail.com'"
+    },
+    "leaderboard": {
+      ".read": true,
+      ".write": "auth != null"
+    },
+    "book_requests": {
+      ".write": "auth != null",
+      ".read": "auth.token.email == 'kvjamtaralibrary@gmail.com'"
+    }
+  }
+}
+```
+
+### Enable Google Authentication
+Firebase Console → **Authentication → Sign-in method → Google → Enable**
+
+Add your domain to **Authorized domains** (e.g. `yourusername.github.io`).
+
+---
+
+## 👩‍💼 Admin Access
+
+Admin panel (`admin.html`) is only accessible to: **kvjamtaralibrary@gmail.com**
+
+Admin can:
+- ✅ Approve or ❌ reject pending comments
+- 📚 Add/delete books in the catalog
+- 💾 Download database backup
+- 📊 View library stats
+
+---
+
+## 🛠️ Making Changes
+
+**Update announcements:** Edit `index.html` — look for the "Library Highlights" section.
+
+**Change admin email:** Edit `js/auth.js` and `admin.html` — search for `kvjamtaralibrary@gmail.com`.
+
+**Add book categories:** Edit the `<select>` in `catalog.html` and `admin.html`.
+
+**Update styles:** Edit `css/styles.css` — CSS variables are at the top (`:root`).
+
+---
+
+## 📋 Git Commands (Quick Reference)
+
+```bash
+# First time setup
+git init
+git add .
+git commit -m "Initial commit"
+git remote add origin https://github.com/YOUR_USERNAME/kvjmt-library.git
+git push -u origin main
+
+# After making changes
+git add .
+git commit -m "Your change description"
+git push
+```
+
+---
+
+*Built with ❤️ for KV Jamtara · Powered by Firebase + GitHub Pages*
