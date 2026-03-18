@@ -346,6 +346,11 @@ var CAT_QUERIES = {
 };
 
 // ── Toast ──
+function coverFallback(img){
+  var t=img.getAttribute('data-title')||'';
+  var a=img.getAttribute('data-author')||'';
+  img.parentNode.innerHTML='<div class="cover-placeholder"><span class="cover-icon">📖</span><div class="cover-title">'+t+'</div><div class="cover-author">'+a+'</div></div>';
+}
 function toast(m){var e=document.getElementById('toast');if(!e)return;e.textContent=m;e.classList.add('show');setTimeout(function(){e.classList.remove('show');},2500);}
 
 // ── Category selection ──
@@ -529,8 +534,10 @@ function renderGrid(books, append) {
     var srcClass = {openlibrary:'src-openlibrary',google:'src-google',gutenberg:'src-gutenberg',ncert:'src-ncert'}[b.source]||'src-openlibrary';
     var srcLabel = {openlibrary:'Open Library',google:'Google Books',gutenberg:'Gutenberg',ncert:'NCERT'}[b.source]||b.source;
 
+    var safeTitle = b.title.replace(/['"<>]/g,'');
+    var safeAuthor = (b.author||'').replace(/['"<>]/g,'');
     var coverHTML = b.cover
-      ? '<img src="'+b.cover+'" alt="'+b.title+'" loading="lazy" onerror="this.parentNode.innerHTML=\'<div class=cover-placeholder><span class=cover-icon>📖</span><div class=cover-title>'+b.title.replace(/'/g,"")+'</div><div class=cover-author>'+(b.author||'').replace(/'/g,"")+'</div></div>\'">'
+      ? '<img src="'+b.cover+'" alt="cover" loading="lazy" data-title="'+safeTitle+'" data-author="'+safeAuthor+'" onerror="coverFallback(this)">'
       : '<div class="cover-placeholder"><span class="cover-icon">📖</span><div class="cover-title">'+b.title+'</div><div class="cover-author">'+b.author+'</div></div>';
 
     card.innerHTML =
