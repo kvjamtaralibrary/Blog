@@ -724,6 +724,23 @@ function libSignIn(){
 }
 function libSignOut(){fbAuth.signOut();}
 
+// ── Auto-search from URL param ?q=... ──
+(function(){
+  var params = new URLSearchParams(window.location.search);
+  var q = params.get('q') || params.get('search');
+  if(q){
+    window.addEventListener('load', function(){
+      var inp = document.getElementById('searchInput');
+      if(inp){ inp.value = q; }
+      if(typeof doSearch === 'function'){ doSearch(); }
+      else {
+        var btn = document.querySelector('.search-box button');
+        if(btn) btn.click();
+      }
+    });
+  }
+})();
+
 fbAuth.onAuthStateChanged(function(user){
   currentUser=user;
   var adminBar=document.getElementById('libAdminBar');
